@@ -20,7 +20,7 @@ export abstract class AbstractMachine implements BaseMachine {
 }
 
 export abstract class InputMachine extends AbstractMachine {
-	inputConnections: string[] = [];
+	inputConnections: (string | undefined)[] = [];
 	getEffectiveInputs(machines: Machine[]) {
 		return this.inputConnections
 			.map(x => (x === undefined ? undefined : (machines.find(y => y.id === x) as OutputMachine)))
@@ -30,7 +30,7 @@ export abstract class InputMachine extends AbstractMachine {
 }
 
 export abstract class OutputMachine extends AbstractMachine {
-	outputConnections: string[] = [];
+	outputConnections: (string | undefined)[] = [];
 
 	abstract calculateOutputs(inputs: Item[]): Item[];
 	getEffectiveOutputs(machines: Machine[]): Item[] {
@@ -77,7 +77,8 @@ export class SplitterMachine extends Mixin(InputMachine, OutputMachine) {
 
 	calculateOutputs(inputs: Item[]): Item[] {
 		if (inputs.length === 0) return [];
-		return [...Array(this.outputConnections.length)].map(() => ({ type: inputs[0].type, count: inputs[0].count / this.outputConnections.length }));
+		const populated = this.outputConnections.filter(x => x !== undefined).length;
+		return this.outputConnections.map(x => x === undefined ? ({ type: inputs[0].type, count: 0 }) : ({ type: inputs[0].type, count: inputs[0].count / populated }));
 	}
 }
 
