@@ -4,6 +4,7 @@ export interface Item {
 }
 
 export interface BaseMachine {
+	readonly type: string;
 	id: string;
 	name: string;
 }
@@ -20,16 +21,19 @@ export interface InputMachine extends BaseMachine {
 export interface OutputMachine extends BaseMachine {
 	recipeOutputs: Item[];
 	outputConnections: InputMachine[];
-	
+
 	calculateOutputs: (inputs: Item[]) => Item[];
+	getOutputs: () => Item[];
 }
 
-export abstract class AbstractMachine {
+export abstract class AbstractMachine implements BaseMachine {
+	abstract readonly type: string;
 	constructor(public id: string, public name: string) {}
 }
 
 export class ProducerMachine extends AbstractMachine implements OutputMachine {
-	outputConnections = [];
+	readonly type = "producer";
+	outputConnections: InputMachine[] = [];
 
 	constructor(id: string, name: string, public speed: number, public recipeOutputs: Item[]) {
 		super(id, name);
@@ -38,29 +42,39 @@ export class ProducerMachine extends AbstractMachine implements OutputMachine {
 	calculateOutputs(inputs: Item[]): Item[] {
 		return this.recipeOutputs.map(x => ({ ...x, count: x.count * this.speed }));
 	}
+
+	getOutputs() {
+		return this.calculateOutputs([]);
+	}
 }
 
 export class ConsumerMachine extends AbstractMachine implements InputMachine {
-	inputConnections = [];
+	readonly type = "consumer";
+	inputConnections: OutputMachine[] = [];
 
 	constructor(id: string, name: string, public recipeInputs: Item[]) {
 		super(id, name);
 	}
-
 }
 
 export class ConverterMachine extends AbstractMachine implements InputMachine, OutputMachine {
-	inputConnections = [];
-	outputConnections = [];
+	readonly type = "converter";
+	inputConnections: OutputMachine[] = [];
+	outputConnections: InputMachine[] = [];
 
-	constructor(id: string, name: string, public speed: number, public inputs: Item[], public recipeInputs: Item[], public recipeOutputs: Item[]) {
+	constructor(id: string, name: string, public speed: number, public recipeInputs: Item[], public recipeOutputs: Item[]) {
 		super(id, name);
 	}
 
 	calculateOutputs(inputs: Item[]): Item[] {
 		if (this.recipeInputs.length !== inputs.length) return [];
-		if (this.recipeInputs.some(x => !inputs.some(y => y.type === x.type))) return [];
-		
-		const rate = Math.min(...inputs.map((x, i) => x.count / this.recipeInputs[i].count));
+		const lowest = Math.min(...this.recipeInputs.map((x, i) => (inputs[i].count / x.count) * this.speed));
+		return this.recipeOutputs.map((x, i) => ({ ...x, count: x.count * lowest * this.speed }));
+	}
+
+	getOutputs() {
+		return this.calculateOutputs(this.inputConnections.map(x => x.getOutputs()[x.outputConnections.indexOf(this)]));
 	}
 }
+
+export type Machine = ProducerMachine | ConsumerMachine | ConverterMachine;
