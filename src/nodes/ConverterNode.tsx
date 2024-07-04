@@ -17,7 +17,7 @@ export const ConverterNode = ({ data }: NodeProps<ConverterMachine>) => {
 			<div className={nodeStyles.nodeContainer}>
 				<h1>{data.name}</h1>
 				<p className={nodeStyles.recipeName}>{data.recipeName}</p>
-				<p>Current Output: {data.getEffectiveOutputs(machines).map(x => `${numberFormat.format(x.count)} ${x.type}`).join(", ") || "None"}</p>
+				<p>Current Output: {data.getEffectiveOutputs(machines).map(x => `${numberFormat.format(x.count)} ${x.type}`).join(", ") || "None"} / min</p>
 			</div>
 			<Handle type="source" position={Position.Bottom} id="0" />
 		</>
