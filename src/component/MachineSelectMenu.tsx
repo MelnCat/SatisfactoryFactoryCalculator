@@ -56,7 +56,7 @@ export const MachineSelectButton = ({
 	const a = useReactFlow();
 	const onClick = () => {
 		setMachineMenu(false);
-		const toAdd = Object.assign(Object.create(Object.getPrototypeOf(machine)), { ...machine, id: Math.random().toString() }) as Machine;
+		const toAdd = Object.assign(Object.create(Object.getPrototypeOf(machine)), structuredClone({ ...machine, id: Math.random().toString() })) as Machine;
 		setNodes(nodes => [
 			...nodes,
 			{

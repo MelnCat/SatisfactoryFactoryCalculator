@@ -3,6 +3,7 @@ import { MachinesContext } from "@/machine/MachinesContext";
 import { useContext, useEffect } from "react";
 import { Handle, NodeProps, Position, useUpdateNodeInternals } from "reactflow";
 import nodeStyles from "./Node.module.scss";
+import { numberFormat } from "@/data/format";
 
 export const ConverterNode = ({ data }: NodeProps<ConverterMachine>) => {
 	const updateNodeInternals = useUpdateNodeInternals();
@@ -16,7 +17,7 @@ export const ConverterNode = ({ data }: NodeProps<ConverterMachine>) => {
 			<div className={nodeStyles.nodeContainer}>
 				<h1>{data.name}</h1>
 				<p className={nodeStyles.recipeName}>{data.recipeName}</p>
-				<p>Current Output: {data.getEffectiveOutputs(machines).map(x => `${x.count} ${x.type}`).join(", ") || "None"}</p>
+				<p>Current Output: {data.getEffectiveOutputs(machines).map(x => `${numberFormat.format(x.count)} ${x.type}`).join(", ") || "None"}</p>
 			</div>
 			<Handle type="source" position={Position.Bottom} id="0" />
 		</>

@@ -5,6 +5,7 @@ import { Machine, ProducerMachine } from "@/machine/machines";
 import { Node, useReactFlow } from "reactflow";
 import { recipes } from "@/data/recipes";
 import { MachinesContext } from "@/machine/MachinesContext";
+import { numberFormat } from "@/data/format";
 
 export const RecipeSelectMenu = ({
 	setRecipeMenu,
@@ -67,15 +68,15 @@ export const RecipeSelectButton = ({
 			<h2>{recipe.name}</h2>
 			{"input" in recipe ? (
 				<p>
-					{(recipe.input instanceof Array ? recipe.input : [recipe.input]).map(x => `${x.count} ${x.type}`).join(", ")} {"→"}
-					{(recipe.output instanceof Array ? recipe.output : [recipe.output]).map(x => `${x.count} ${x.type}`).join(", ")}{" "}
+					{(recipe.input instanceof Array ? recipe.input : [recipe.input]).map(x => `${numberFormat.format(x.count)} ${x.type}`).join(", ")} {"→"}
+					{(recipe.output instanceof Array ? recipe.output : [recipe.output]).map(x => `${numberFormat.format(x.count)} ${x.type}`).join(", ")}{" "}
 				</p>
 			) : (
 				<p>
 					{firstOutput.count} {firstOutput.type}{" "}
 				</p>
 			)}
-			{"speed" in recipe && <p>{firstOutput.count * recipe.speed} / min</p>}
+			{"speed" in recipe && <p>{(numberFormat.format(firstOutput.count * recipe.speed))} / min</p>}
 		</button>
 	);
 };

@@ -54,29 +54,28 @@ export default function Home() {
 	const onNodesChange = useCallback<OnNodesChange>(changes => setNodes(nds => applyNodeChanges(changes, nds)), []);
 	const onEdgesChange = useCallback<OnEdgesChange>(changes => setEdges(eds => applyEdgeChanges(changes, eds)), []);
 	const onConnect = useCallback<OnConnect>(params => {
-		setMachines(machines => {
-			const newMachines = machines.map(x => Object.assign(Object.create(Object.getPrototypeOf(x)), x));
-			const source = newMachines.find(x => x.id === params.source) as OutputMachine;
-			const target = newMachines.find(x => x.id === params.target) as InputMachine;
-			if (source.outputConnections[+params.sourceHandle!] !== undefined)
-				newMachines.find(x => x.id === source.outputConnections[+params.sourceHandle!])!.inputConnections[
-					newMachines.find(x => x.id === source.outputConnections[+params.sourceHandle!])!.inputConnections.indexOf(source.id)
-				] = undefined;
-			if (target.inputConnections[+params.targetHandle!] !== undefined)
-				newMachines.find(x => x.id === target.inputConnections[+params.targetHandle!])!.outputConnections[
-					newMachines.find(x => x.id === target.inputConnections[+params.targetHandle!])!.outputConnections.indexOf(target.id)
-				] = undefined;
-			source.outputConnections[+params.sourceHandle!] = target.id;
-			target.inputConnections[+params.targetHandle!] = source.id;
-			return newMachines;
-		});
+		const newMachines = machines.map(x => Object.assign(Object.create(Object.getPrototypeOf(x)), x));
+		const source = newMachines.find(x => x.id === params.source) as OutputMachine;
+		const target = newMachines.find(x => x.id === params.target) as InputMachine;
+		if (source.outputConnections[+params.sourceHandle!] !== undefined)
+			newMachines.find(x => x.id === source.outputConnections[+params.sourceHandle!])!.inputConnections[
+				newMachines.find(x => x.id === source.outputConnections[+params.sourceHandle!])!.inputConnections.indexOf(source.id)
+			] = undefined;
+		if (target.inputConnections[+params.targetHandle!] !== undefined)
+			newMachines.find(x => x.id === target.inputConnections[+params.targetHandle!])!.outputConnections[
+				newMachines.find(x => x.id === target.inputConnections[+params.targetHandle!])!.outputConnections.indexOf(target.id)
+			] = undefined;
+		source.outputConnections[+params.sourceHandle!] = target.id;
+		target.inputConnections[+params.targetHandle!] = source.id;
+		setMachines(newMachines);
+		setNodes(nodes => nodes.map(x => ({ ...x, data: newMachines.find(y => y.id === x.id) })));
 		setEdges(eds => {
 			return addEdge(
 				params,
 				eds.filter(x => !((x.source === params.source && x.sourceHandle === params.sourceHandle) || (x.target === params.target && x.targetHandle === params.targetHandle)))
 			);
 		});
-	}, []);
+	}, [machines]);
 	const onNodeContextMenu = useCallback<NodeMouseHandler>((event, node) => {
 		event.preventDefault();
 		setMenuData({
