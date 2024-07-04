@@ -1,37 +1,40 @@
 "use client";
-import { ConsumerMachine, ConverterMachine, InputMachine, Machine, OutputMachine, ProducerMachine, SplitterMachine } from "@/machine/machines";
+import { ConsumerMachine, ConverterMachine, InputMachine, Machine, MergerMachine, OutputMachine, ProducerMachine, SplitterMachine } from "@/machine/machines";
 import { MachinesContext } from "@/machine/MachinesContext";
 import { ConsumerNode } from "@/nodes/ConsumerNode";
 import { ConverterNode } from "@/nodes/ConverterNode";
 import { ProducerNode } from "@/nodes/ProducerNode";
 import { useCallback, useState } from "react";
-import ReactFlow, { addEdge, applyEdgeChanges, applyNodeChanges, Background, Controls, Edge, Node, NodeMouseHandler, OnConnect, OnEdgesChange, OnNodesChange } from "reactflow";
+import ReactFlow, {
+	addEdge,
+	applyEdgeChanges,
+	applyNodeChanges,
+	Background,
+	Controls,
+	Edge,
+	EdgeMouseHandler,
+	Node,
+	NodeMouseHandler,
+	OnConnect,
+	OnEdgesChange,
+	OnNodesChange,
+} from "reactflow";
 import styles from "./page.module.css";
 import { SplitterNode } from "@/nodes/SplitterNode";
 import { ContextMenu, ContextMenuData } from "@/component/ContextMenu";
+import { MergerNode } from "@/nodes/MergerNode";
+import { MachineSelectMenu } from "@/component/MachineSelectMenu";
 
 const nodeTypes = {
 	producer: ProducerNode,
 	consumer: ConsumerNode,
 	converter: ConverterNode,
 	splitter: SplitterNode,
+	merger: MergerNode,
 };
 
 export default function Home() {
 	const [machines, setMachines] = useState<Machine[]>([
-		new ProducerMachine("1", "Miner", 60, [{ type: "ironOre", count: 1 }]),
-		new ConsumerMachine("2", "Output", [{ type: "ironIngot", count: 1 }]),
-		new ConverterMachine("3", "Smelter", 30, [{ type: "ironOre", count: 1 }], [{ type: "ironIngot", count: 1 }]),
-		new SplitterMachine("4", "Splitter"),
-		new SplitterMachine("5", "Splitter"),
-		new SplitterMachine("6", "Splitter"),
-		// add the iron products (rod, plate, screw, etc)
-		new ConverterMachine("7", "Constructor", 15, [{ type: "ironIngot", count: 1 }], [{ type: "ironRod", count: 1 }]),
-		new ConverterMachine("8", "Constructor", 10, [{ type: "ironIngot", count: 2 }], [{ type: "ironPlate", count: 3 }]),
-		new ConverterMachine("9", "Constructor", 10, [{ type: "ironRod", count: 1 }], [{ type: "ironScrew", count: 4 }]),
-		new ConverterMachine("9", "Assembler", 5, [{ type: "ironPlate", count: 6 }, { type: "ironScrew", count: 12 }], [{ type: "reinforcedIronPlate", count: 4 }]),
-		
-
 	]);
 
 	const [nodes, setNodes] = useState<Node[]>(
@@ -43,28 +46,29 @@ export default function Home() {
 		}))
 	);
 	const [edges, setEdges] = useState<Edge[]>([]);
+	const [machineMenu, setMachineMenu] = useState<boolean>(false);
 	const [menuData, setMenuData] = useState<ContextMenuData | null>(null);
 
 	const onNodesChange = useCallback<OnNodesChange>(changes => setNodes(nds => applyNodeChanges(changes, nds)), []);
 	const onEdgesChange = useCallback<OnEdgesChange>(changes => setEdges(eds => applyEdgeChanges(changes, eds)), []);
 	const onConnect = useCallback<OnConnect>(params => {
+		setMachines(machines => {
+			const newMachines = machines.map(x => Object.assign(Object.create(Object.getPrototypeOf(x)), x));
+			const source = newMachines.find(x => x.id === params.source) as OutputMachine;
+			const target = newMachines.find(x => x.id === params.target) as InputMachine;
+			if (source.outputConnections[+params.sourceHandle!] !== undefined)
+				newMachines.find(x => x.id === source.outputConnections[+params.sourceHandle!])!.inputConnections[
+					newMachines.find(x => x.id === source.outputConnections[+params.sourceHandle!])!.inputConnections.indexOf(source.id)
+				] = undefined;
+			if (target.inputConnections[+params.targetHandle!] !== undefined)
+				newMachines.find(x => x.id === target.inputConnections[+params.targetHandle!])!.outputConnections[
+					newMachines.find(x => x.id === target.inputConnections[+params.targetHandle!])!.outputConnections.indexOf(target.id)
+				] = undefined;
+			source.outputConnections[+params.sourceHandle!] = target.id;
+			target.inputConnections[+params.targetHandle!] = source.id;
+			return newMachines;
+		});
 		setEdges(eds => {
-			setMachines(machines => {
-				const newMachines = machines.map(x => Object.assign(Object.create(Object.getPrototypeOf(x)), x));
-				const source = newMachines.find(x => x.id === params.source) as OutputMachine;
-				const target = newMachines.find(x => x.id === params.target) as InputMachine;
-				if (source.outputConnections[+params.sourceHandle!] !== undefined)
-					newMachines.find(x => x.id === source.outputConnections[+params.sourceHandle!])!.inputConnections[
-						newMachines.find(x => x.id === source.outputConnections[+params.sourceHandle!])!.inputConnections.indexOf(source.id)
-					] = undefined;
-				if (target.inputConnections[+params.targetHandle!] !== undefined)
-					newMachines.find(x => x.id === target.inputConnections[+params.targetHandle!])!.outputConnections[
-						newMachines.find(x => x.id === target.inputConnections[+params.targetHandle!])!.outputConnections.indexOf(target.id)
-					] = undefined;
-				source.outputConnections[+params.sourceHandle!] = target.id;
-				target.inputConnections[+params.targetHandle!] = source.id;
-				return newMachines;
-			});
 			return addEdge(
 				params,
 				eds.filter(x => !((x.source === params.source && x.sourceHandle === params.sourceHandle) || (x.target === params.target && x.targetHandle === params.targetHandle)))
@@ -80,12 +84,28 @@ export default function Home() {
 			data: node.data,
 		});
 	}, []);
+	const onEdgeContextMenu = useCallback<EdgeMouseHandler>((event, edge) => {
+		event.preventDefault();
+		setEdges(eds => eds.filter(x => x.id !== edge.id));
+		const newMachines = machines.map(x => Object.assign(Object.create(Object.getPrototypeOf(x)), x));
+		const source = newMachines.find(x => x.id === edge.source) as OutputMachine;
+		const target = newMachines.find(x => x.id === edge.target) as InputMachine;
+		source.outputConnections[+edge.sourceHandle!] = undefined;
+		target.inputConnections[+edge.targetHandle!] = undefined;
+		setMachines(newMachines);
+		setNodes(nodes => nodes.map(x => ({ ...x, data: newMachines.find(y => y.id === x.id) })));
+	}, []);
 	const onPaneClick = useCallback(() => {
 		setMenuData(null);
+		setMachineMenu(false);
+	}, []);
+	const onMachineMenuButtonClick = useCallback(() => {
+		setMachineMenu(true);
 	}, []);
 	return (
 		<MachinesContext.Provider value={machines}>
 			<main className={styles.main}>
+				<button className={styles.machineMenuButton} onClick={onMachineMenuButtonClick}>Machines</button>
 				<div className={styles.flowContainer}>
 					<ReactFlow
 						nodes={nodes}
@@ -96,8 +116,10 @@ export default function Home() {
 						nodeTypes={nodeTypes}
 						onNodeContextMenu={onNodeContextMenu}
 						onPaneClick={onPaneClick}
+						onEdgeContextMenu={onEdgeContextMenu}
 					>
 						<Background />
+						{machineMenu && <MachineSelectMenu setMachineMenu={setMachineMenu} setMachines={setMachines} setNodes={setNodes} />}
 						{menuData && <ContextMenu setMachines={setMachines} data={menuData} setNodes={setNodes} setMenuData={setMenuData} setEdges={setEdges} />}
 					</ReactFlow>
 				</div>

@@ -14,8 +14,8 @@ export const ContextMenu = ({
 	data,
 	setMachines,
 	setNodes,
-	setMenuData,
 	setEdges,
+	setMenuData,
 }: {
 	data: ContextMenuData;
 	setMachines: Dispatch<SetStateAction<Machine[]>>;
@@ -23,7 +23,6 @@ export const ContextMenu = ({
 	setMenuData: Dispatch<SetStateAction<ContextMenuData | null>>;
 	setEdges: Dispatch<SetStateAction<Edge[]>>;
 }) => {
-	console.log(data)
 	const ref = useRef(null);
 	const handleClickOutside = () => {
 		setMenuData(null);

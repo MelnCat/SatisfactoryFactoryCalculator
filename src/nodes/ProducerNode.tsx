@@ -3,6 +3,7 @@ import { Handle, NodeProps, Position } from "reactflow";
 import nodeStyles from "./Node.module.scss";
 
 export const ProducerNode = ({ data }: NodeProps<ProducerMachine>) => {
+	if (data === undefined) return <h1>hi</h1>;
 	return (
 		<>
 			<div className={nodeStyles.nodeContainer}>
