@@ -24,6 +24,7 @@ import { SplitterNode } from "@/nodes/SplitterNode";
 import { ContextMenu, ContextMenuData } from "@/component/ContextMenu";
 import { MergerNode } from "@/nodes/MergerNode";
 import { MachineSelectMenu } from "@/component/MachineSelectMenu";
+import { RecipeSelectButton, RecipeSelectMenu } from "@/component/RecipeSelectMenu";
 
 const nodeTypes = {
 	producer: ProducerNode,
@@ -47,6 +48,7 @@ export default function Home() {
 	);
 	const [edges, setEdges] = useState<Edge[]>([]);
 	const [machineMenu, setMachineMenu] = useState<boolean>(false);
+	const [recipeMenu, setRecipeMenu] = useState<Machine | null>(null);
 	const [menuData, setMenuData] = useState<ContextMenuData | null>(null);
 
 	const onNodesChange = useCallback<OnNodesChange>(changes => setNodes(nds => applyNodeChanges(changes, nds)), []);
@@ -98,6 +100,7 @@ export default function Home() {
 	const onPaneClick = useCallback(() => {
 		setMenuData(null);
 		setMachineMenu(false);
+		setRecipeMenu(null);
 	}, []);
 	const onMachineMenuButtonClick = useCallback(() => {
 		setMachineMenu(true);
@@ -105,7 +108,6 @@ export default function Home() {
 	return (
 		<MachinesContext.Provider value={machines}>
 			<main className={styles.main}>
-				<button className={styles.machineMenuButton} onClick={onMachineMenuButtonClick}>Machines</button>
 				<div className={styles.flowContainer}>
 					<ReactFlow
 						nodes={nodes}
@@ -119,8 +121,11 @@ export default function Home() {
 						onEdgeContextMenu={onEdgeContextMenu}
 					>
 						<Background />
+						<button className={styles.machineMenuButton} onClick={onMachineMenuButtonClick}>Machines</button>
 						{machineMenu && <MachineSelectMenu setMachineMenu={setMachineMenu} setMachines={setMachines} setNodes={setNodes} />}
-						{menuData && <ContextMenu setMachines={setMachines} data={menuData} setNodes={setNodes} setMenuData={setMenuData} setEdges={setEdges} />}
+						{recipeMenu && <RecipeSelectMenu machine={recipeMenu} setRecipeMenu={setRecipeMenu} setMachines={setMachines} setNodes={setNodes} />}
+
+						{menuData && <ContextMenu setRecipeMenu={setRecipeMenu} setMachines={setMachines} data={menuData} setNodes={setNodes} setMenuData={setMenuData} setEdges={setEdges} />}
 					</ReactFlow>
 				</div>
 			</main>

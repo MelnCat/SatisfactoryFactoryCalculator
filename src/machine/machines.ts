@@ -16,6 +16,7 @@ export interface ProcessingMachine extends BaseMachine {
 
 export abstract class AbstractMachine implements BaseMachine {
 	abstract readonly type: string;
+	recipeName = "Unconfigured";
 	constructor(public id: string, public name: string, public tag: string) {}
 }
 
@@ -53,7 +54,7 @@ export class ProducerMachine extends OutputMachine {
 export class ConsumerMachine extends InputMachine {
 	readonly type = "consumer";
 
-	constructor(id: string, name: string, tag: string, public recipeInputs: Item[]) {
+	constructor(id: string, name: string, tag: string) {
 		super(id, name, tag);
 	}
 }

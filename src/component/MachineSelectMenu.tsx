@@ -1,11 +1,21 @@
 import { Dispatch, SetStateAction, useRef } from "react";
 import { useOnClickOutside } from "usehooks-ts";
 import styles from "./MachineSelectMenu.module.scss";
-import { Machine, ProducerMachine } from "@/machine/machines";
+import { ConsumerMachine, ConverterMachine, Machine, MergerMachine, ProducerMachine, SplitterMachine } from "@/machine/machines";
 import { Node, useReactFlow } from "reactflow";
 import { recipes } from "@/data/recipes";
 
-const machineList = [{ name: "Miner MK1", machine: new ProducerMachine("", "Miner", "miner", 60, [recipes.miner_mk1[0].output]) }];
+const machineList = [
+	{ name: "Output", machine: new ConsumerMachine("", "Output", "") },
+	{ name: "Splitter", machine: new SplitterMachine("", "Splitter", "") },
+	{ name: "Merger", machine: new MergerMachine("", "Merger", "") },
+	{ name: "Miner MK1", machine: new ProducerMachine("", "Miner MK1", "miner_mk1", 1, []) },
+	{ name: "Miner MK2", machine: new ProducerMachine("", "Miner MK2", "miner_mk1", 2, []) },
+	{ name: "Miner MK3", machine: new ProducerMachine("", "Miner MK3", "miner_mk1", 4, []) },
+	{ name: "Smelter", machine: new ConverterMachine("", "Smelter", "smelter", 1, [], []) },
+	{ name: "Constructor", machine: new ConverterMachine("", "Constructor", "constructor", 1, [], []) },
+	{ name: "Assembler", machine: new ConverterMachine("", "Assembler", "assembler", 1, [], []) }
+];
 
 export const MachineSelectMenu = ({
 	setMachineMenu,

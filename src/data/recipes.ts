@@ -12,7 +12,6 @@ export const recipes = {
 			name: "Impure Iron",
 			output: { type: "ironOre", count: 30 },
 		},
-
 	],
 	smelter: [
 		{
@@ -57,6 +56,62 @@ export const recipes = {
 			name: "Cast Screw [Alt]",
 			input: { type: "ironIngot", count: 5 },
 			output: { type: "ironScrew", count: 20 },
+			speed: 2.5,
+		},
+		{
+			name: "Wire",
+			input: { type: "copperIngot", count: 1 },
+			output: { type: "wire", count: 2 },
+			speed: 15,
+		},
+		{
+			name: "Cable",
+			input: { type: "wire", count: 2 },
+			output: { type: "cable", count: 1 },
+			speed: 30,
+		},
+		{
+			name: "Copper Sheet",
+			input: { type: "copperIngot", count: 2 },
+			output: { type: "copperSheet", count: 1 },
+			speed: 10,
+		},
+	],
+	assembler: [
+		{
+			name: "Reinforced Iron Plate",
+			input: [
+				{ type: "ironPlate", count: 6 },
+				{ type: "ironScrew", count: 12 },
+			],
+			output: { type: "reinforcedIronPlate", count: 1 },
+			speed: 5,
+		},
+		{
+			name: "Rotor",
+			input: [
+				{ type: "ironRod", count: 5 },
+				{ type: "ironScrew", count: 25 },
+			],
+			output: { type: "rotor", count: 1 },
+			speed: 4,
+		},
+		{
+			name: "Modular Frame",
+			input: [
+				{ type: "reinforcedIronPlate", count: 3 },
+				{ type: "ironRod", count: 12 },
+			],
+			output: { type: "modularFrame", count: 1 },
+			speed: 2,
+		},
+		{
+			name: "Smart Plating",
+			input: [
+				{ type: "reinforcedIronPlate", count: 2 },
+				{ type: "rotor", count: 2 },
+			],
+			output: { type: "smartPlating", count: 1 },
 			speed: 2.5,
 		},
 	],

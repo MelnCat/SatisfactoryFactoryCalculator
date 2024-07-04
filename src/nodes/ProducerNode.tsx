@@ -8,7 +8,8 @@ export const ProducerNode = ({ data }: NodeProps<ProducerMachine>) => {
 		<>
 			<div className={nodeStyles.nodeContainer}>
 				<h1>{data.name}</h1>
-				<p>{data.recipeOutputs[0].count * data.speed} {data.recipeOutputs[0].type} / min</p>
+				<p className={nodeStyles.recipeName}>{data.recipeName}</p>
+				{data.recipeOutputs.length !== 0 && <p>{data.recipeOutputs[0].count * data.speed} {data.recipeOutputs[0].type} / min</p>}
 			</div>
 			<Handle type="source" position={Position.Bottom} id="0" />
 		</>
