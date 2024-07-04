@@ -12,6 +12,18 @@ export const recipes = {
 			name: "Impure Iron",
 			output: { type: "ironOre", count: 30 },
 		},
+		{
+			name: "Normal Copper",
+			output: { type: "copperOre", count: 60 },
+		},
+		{
+			name: "Pure Copper",
+			output: { type: "copperOre", count: 120 },
+		},
+		{
+			name: "Impure Copper",
+			output: { type: "copperOre", count: 30 },
+		},
 	],
 	smelter: [
 		{

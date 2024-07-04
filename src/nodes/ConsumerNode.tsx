@@ -16,7 +16,7 @@ export const ConsumerNode = ({ data }: NodeProps<ConsumerMachine>) => {
 				<ul>
 					{data.getEffectiveInputs(machines).map(x => (
 						<li key={`${x.count}${x.type}`}>
-							{numberFormat.format(x.count)} {x.type}
+							{numberFormat.format(x.count)} {x.type} / min
 						</li>
 					))}
 				</ul>
