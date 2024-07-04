@@ -8,12 +8,17 @@ export const ConverterNode = ({ data }: NodeProps<ConverterMachine>) => {
 	const machines = useContext(MachinesContext);
 	return (
 		<>
-			<Handle type="target" position={Position.Top} id="0" />
+			{data.recipeInputs.map((_, i) => (
+				<Handle key={i} type="target" position={Position.Top} id={i.toString()} style={{ left: `${((i + 1) * 100) / (data.recipeInputs.length + 1)}%` }} />
+			))}
 			<div className={nodeStyles.nodeContainer}>
 				<h1>{data.name}</h1>
-				<p>
-					In: {data.recipeInputs[0].count * data.speed} {data.recipeInputs[0].type} / min
-				</p>
+				{data.recipeInputs.map((input, index) => (
+					<p key={index}>
+						In: {input.count * data.speed} {input.type} / min
+					</p>
+				))}
+
 				<p>
 					Out: {data.recipeOutputs[0].count * data.speed} {data.recipeOutputs[0].type} / min
 				</p>

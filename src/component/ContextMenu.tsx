@@ -23,6 +23,7 @@ export const ContextMenu = ({
 	setMenuData: Dispatch<SetStateAction<ContextMenuData | null>>;
 	setEdges: Dispatch<SetStateAction<Edge[]>>;
 }) => {
+	console.log(data)
 	const ref = useRef(null);
 	const handleClickOutside = () => {
 		setMenuData(null);
@@ -38,9 +39,10 @@ export const ContextMenu = ({
 							if ("inputConnections" in m) m.inputConnections = m.inputConnections.map(x => (x === data.nodeId ? undefined : x));
 							if ("outputConnections" in m) m.outputConnections = m.outputConnections.map(x => (x === data.nodeId ? undefined : x));
 						}
+						setNodes(nodes => nodes.filter(x => x.id !== data.nodeId).map(x => ({ ...x, data: newMachines.find(y => y.id === x.id) })));
+
 						return newMachines;
 					});
-					setNodes(nodes => nodes.filter(x => x.id !== data.nodeId));
 					setEdges(edges => edges.filter(x => x.source !== data.nodeId && x.target !== data.nodeId));
 					setMenuData(null);
 				}}

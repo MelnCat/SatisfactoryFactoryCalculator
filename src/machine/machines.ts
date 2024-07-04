@@ -67,8 +67,8 @@ export class ConverterMachine extends Mixin(InputMachine, OutputMachine) {
 
 	calculateOutputs(inputs: Item[]): Item[] {
 		if (this.recipeInputs.length !== inputs.length) return [];
-		const lowest = Math.min(...this.recipeInputs.map((x, i) => (inputs[i].count / x.count) * this.speed), this.speed);
-		return this.recipeOutputs.map((x, i) => ({ ...x, count: x.count * lowest }));
+		const lowest = Math.min(...this.recipeInputs.map((x, i) => ((inputs.find(y => y.type === x.type)?.count ?? 0) / (x.count * this.speed))), 1);
+		return this.recipeOutputs.map((x, i) => ({ ...x, count: x.count * lowest * this.speed }));
 	}
 }
 

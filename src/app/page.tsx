@@ -19,10 +19,19 @@ const nodeTypes = {
 
 export default function Home() {
 	const [machines, setMachines] = useState<Machine[]>([
-		new ProducerMachine("1", "Iron Miner", 60, [{ type: "ironOre", count: 1 }]),
-		new ConsumerMachine("2", "Iron Eater", [{ type: "ironIngot", count: 1 }]),
-		new ConverterMachine("3", "Iron Smelter", 30, [{ type: "ironOre", count: 1 }], [{ type: "ironIngot", count: 1 }]),
+		new ProducerMachine("1", "Miner", 60, [{ type: "ironOre", count: 1 }]),
+		new ConsumerMachine("2", "Output", [{ type: "ironIngot", count: 1 }]),
+		new ConverterMachine("3", "Smelter", 30, [{ type: "ironOre", count: 1 }], [{ type: "ironIngot", count: 1 }]),
 		new SplitterMachine("4", "Splitter"),
+		new SplitterMachine("5", "Splitter"),
+		new SplitterMachine("6", "Splitter"),
+		// add the iron products (rod, plate, screw, etc)
+		new ConverterMachine("7", "Constructor", 15, [{ type: "ironIngot", count: 1 }], [{ type: "ironRod", count: 1 }]),
+		new ConverterMachine("8", "Constructor", 10, [{ type: "ironIngot", count: 2 }], [{ type: "ironPlate", count: 3 }]),
+		new ConverterMachine("9", "Constructor", 10, [{ type: "ironRod", count: 1 }], [{ type: "ironScrew", count: 4 }]),
+		new ConverterMachine("9", "Assembler", 5, [{ type: "ironPlate", count: 6 }, { type: "ironScrew", count: 12 }], [{ type: "reinforcedIronPlate", count: 4 }]),
+		
+
 	]);
 
 	const [nodes, setNodes] = useState<Node[]>(
@@ -89,7 +98,6 @@ export default function Home() {
 						onPaneClick={onPaneClick}
 					>
 						<Background />
-						<Controls />
 						{menuData && <ContextMenu setMachines={setMachines} data={menuData} setNodes={setNodes} setMenuData={setMenuData} setEdges={setEdges} />}
 					</ReactFlow>
 				</div>
