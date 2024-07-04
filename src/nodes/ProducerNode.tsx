@@ -1,5 +1,4 @@
 import { ProducerMachine } from "@/machine/machines";
-import { useCallback } from "react";
 import { Handle, NodeProps, Position } from "reactflow";
 import nodeStyles from "./Node.module.scss";
 
